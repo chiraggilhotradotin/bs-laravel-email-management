@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Email;
 use Illuminate\Http\Request;
 
 class EmailController extends Controller
@@ -11,7 +12,7 @@ class EmailController extends Controller
      */
     public function index()
     {
-        //
+        return view('index', ['emails'=>Email::paginate(10)]);
     }
 
     /**
@@ -19,7 +20,7 @@ class EmailController extends Controller
      */
     public function create()
     {
-        //
+        return view('create');
     }
 
     /**
@@ -27,7 +28,15 @@ class EmailController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:emails'
+        ]);
+        $email = new Email();
+        $email->name = $request->name;
+        $email->email = $request->email;
+        $email->save();
+        return redirect(route('emails.index'));
     }
 
     /**
@@ -51,6 +60,7 @@ class EmailController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        Email::find($id)->delete();
+        return redirect(route('emails.index'));
     }
 }
