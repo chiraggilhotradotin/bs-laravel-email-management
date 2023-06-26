@@ -29,8 +29,8 @@ class EmailController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:emails'
+            'name' => 'required|max:255',
+            'email' => 'required|max:255|email|unique:emails'
         ]);
         $email = new Email();
         $email->name = $request->name;
@@ -44,7 +44,8 @@ class EmailController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $email = Email::findOrFail($id);
+        return view("edit",['email'=>$email]);
     }
 
     /**
@@ -52,7 +53,15 @@ class EmailController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            "name" => "required|max:255",
+            "email" => "required|max:255|email|unique:emails,email,$id"
+        ]);
+        $email = Email::findOrFail($id);
+        $email->name = $request->name;
+        $email->email = $request->email;
+        $email->save();
+        return redirect()->route("emails.index");
     }
 
     /**
